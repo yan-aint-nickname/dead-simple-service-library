@@ -1,9 +1,7 @@
-package main
+package dead_simple_service_library
 
 import "fmt"
 
-func PrintHello(){
+func PrintHello() {
 	fmt.Println("Hello from dead simple service library")
 }
-
-func main() {}
