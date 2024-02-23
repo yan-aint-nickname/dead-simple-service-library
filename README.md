@@ -10,8 +10,8 @@ TODO:
     - migration managment ?? (opt-out)
   - kafka (opt-out)
   - mongodb (opt-out)
-  - http(fiber?) (opt-out/obligatory?) https://github.com/gofiber/fiber ~> fastest? + feature-rich
-    - use viper as config manager
+  - http framework - fiber (obligatory) https://github.com/gofiber/fiber ~> fastest? + feature-rich
+    - [x] use viper as config manager
   - worker/job scheduler (opt-in/opt-out?) https://github.com/go-co-op/gocron?tab=readme-ov-file
   - graphql ?? (opt-in) https://github.com/graph-gophers/graphql-go
 
@@ -20,7 +20,7 @@ TODO:
     - https://docs.gofiber.io/contrib/fibersentry_v1.x.x/otelfiber/
   - sentry-sdk (obligatory) https://github.com/getsentry/sentry-go ~> https://docs.gofiber.io/contrib/fibersentry/
 
-- json https://github.com/goccy/go-json ~> fastest + encoding/json compatible
+- json (std encoding/json)
 
 - logging https://github.com/sirupsen/logrus ~> loguru-like + std compatible
 

@@ -1,19 +1,21 @@
 package dead_simple_service_library
 
 import (
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 	"log"
 )
 
+// Nasty hack for dealing with nested settings
+// Addr: "0.0.0.0:8080" default: "0.0.0.0:<random_unused_port>"
 type Settings struct {
-	Http fiber.Config
-	Port string `mapstructure:"PORT"`
+	AppName string `mapstructure:"app_name"`
+	Addr    string
 }
 
-func LoadSettings() (Settings, error) {
+func LoadSettings() (settings Settings, err error) {
 	// Set the file name of the configurations file
-	viper.SetConfigName("local.env")
+	viper.SetConfigName("local.http.env")
 	viper.SetConfigType("env")
 
 	// Set the path to look for the configurations file
@@ -22,24 +24,29 @@ func LoadSettings() (Settings, error) {
 	// Enable VIPER to read Environment Variables
 	viper.AutomaticEnv()
 
-	// Read in the configuration file
-	if err := viper.ReadInConfig(); err != nil {
-		return Settings{}, err
+	if err = viper.ReadInConfig(); err != nil {
+		return
 	}
 
-	settings := Settings{}
+	err = viper.Unmarshal(&settings)
+	viper.Debug()
 
-	err := viper.Unmarshal(&settings)
-
-	return settings, err
+	return
 }
 
+func loadFiberConfigFromSettings(settings Settings) fiber.Config {
+	return fiber.Config{
+		AppName: settings.AppName,
+	}
+}
 
 func RunFromSettings(app *fiber.App, settings Settings) {
-	log.Fatal(app.Listen(settings.Port))
+	log.Fatal(app.Listen(settings.Addr))
 }
 
 func CreateDefaultApp(settings Settings) *fiber.App {
-	app := fiber.New(settings.Http)
+	fiberConfig := loadFiberConfigFromSettings(settings)
+	log.Println(fiberConfig)
+	app := fiber.New(fiberConfig)
 	return app
 }
