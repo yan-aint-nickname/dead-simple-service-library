@@ -1,4 +1,4 @@
-module github.com/yan-aint-nickname/dead-simple-service-library
+module github.com/yan-aint-nickname/dead-simple-service-library/http
 
 go 1.21.6
 
