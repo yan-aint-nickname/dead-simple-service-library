@@ -6,17 +6,16 @@ import (
 	"log"
 )
 
-// Nasty hack for dealing with nested settings
-// Addr: "0.0.0.0:8080" default: "0.0.0.0:<random_unused_port>"
-type Settings struct {
-	AppName string `mapstructure:"app_name"`
-	Addr    string
-}
-
-func LoadSettings() (settings Settings, err error) {
+// NOTE: I don't use struct to unmarshal in
+//  because I kinda need a runtime access to the settings
+//  and I can't predict what you might need in your application
+//  you can use native viper to get access to the settings
+func LoadSettingsHttp() (err error) {
 	// Set the file name of the configurations file
 	viper.SetConfigName("local.http.env")
 	viper.SetConfigType("env")
+	viper.SetDefault("addr", "0.0.0.0:8080")
+	viper.SetDefault("app_name", "Test App !Change Name!")
 
 	// Set the path to look for the configurations file
 	viper.AddConfigPath(".")
@@ -27,26 +26,20 @@ func LoadSettings() (settings Settings, err error) {
 	if err = viper.ReadInConfig(); err != nil {
 		return
 	}
-
-	err = viper.Unmarshal(&settings)
-	viper.Debug()
-
 	return
 }
 
-func loadFiberConfigFromSettings(settings Settings) fiber.Config {
+func loadFiberConfigFromSettings() fiber.Config {
 	return fiber.Config{
-		AppName: settings.AppName,
+		AppName: viper.GetString("app_name"),
 	}
 }
 
-func RunFromSettings(app *fiber.App, settings Settings) {
-	log.Fatal(app.Listen(settings.Addr))
+func RunFromSettings(app *fiber.App) {
+	log.Fatal(app.Listen(viper.GetString("addr")))
 }
 
-func CreateDefaultApp(settings Settings) *fiber.App {
-	fiberConfig := loadFiberConfigFromSettings(settings)
-	log.Println(fiberConfig)
-	app := fiber.New(fiberConfig)
-	return app
+func CreateDefaultApp() *fiber.App {
+	fiberConfig := loadFiberConfigFromSettings()
+	return fiber.New(fiberConfig)
 }
