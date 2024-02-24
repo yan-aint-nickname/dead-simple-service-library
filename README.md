@@ -38,3 +38,4 @@ TODO:
 
 - local development:
   - replace github.com/user/library => /local/path/library (replace directive works)
+- styleguide: https://github.com/uber-go/guide/blob/master/style.md
