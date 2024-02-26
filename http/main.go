@@ -38,7 +38,7 @@ func loadSentry() error {
 		log.Fatal("sentry_dsn not set")
 		os.Exit(1)
 	}
-	// FIXME: does not work properly!
+
 	err := sentry.Init(sentry.ClientOptions{
 		Dsn: viper.GetString("sentry_dsn"),
 		EnableTracing: true,
@@ -51,6 +51,7 @@ func loadSentry() error {
 }
 
 func getSentryMiddleware() gin.HandlerFunc {
+	loadSentry()
 	return sentrygin.New(sentrygin.Options{
 		Repanic: true,
 	})
