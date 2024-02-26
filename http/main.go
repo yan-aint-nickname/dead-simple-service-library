@@ -1,9 +1,13 @@
 package http
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/spf13/viper"
 	"log"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
 )
 
 // NOTE: I don't use struct to unmarshal in
@@ -29,17 +33,37 @@ func LoadSettingsHttp() (err error) {
 	return
 }
 
-func loadFiberConfigFromSettings() fiber.Config {
-	return fiber.Config{
-		AppName: viper.GetString("app_name"),
+func loadSentry() error {
+	if ok := viper.IsSet("sentry_dsn"); !ok {
+		log.Fatal("sentry_dsn not set")
+		os.Exit(1)
 	}
+	// FIXME: does not work properly!
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: viper.GetString("sentry_dsn"),
+		EnableTracing: true,
+		AttachStacktrace: true,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func RunFromSettings(app *fiber.App) {
-	log.Fatal(app.Listen(viper.GetString("addr")))
+func getSentryMiddleware() gin.HandlerFunc {
+	return sentrygin.New(sentrygin.Options{
+		Repanic: true,
+	})
 }
 
-func CreateDefaultApp() *fiber.App {
-	fiberConfig := loadFiberConfigFromSettings()
-	return fiber.New(fiberConfig)
+func RunFromSettings(app *gin.Engine) {
+	log.Fatal(app.Run(viper.GetString("addr")))
+}
+
+func CreateDefaultApp() *gin.Engine {
+	app := gin.Default()
+
+	app.Use(getSentryMiddleware())
+
+	return app
 }
