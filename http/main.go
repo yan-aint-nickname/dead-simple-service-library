@@ -4,16 +4,17 @@ import (
 	"log"
 	"os"
 
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"github.com/getsentry/sentry-go"
 	sentrygin "github.com/getsentry/sentry-go/gin"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 // NOTE: I don't use struct to unmarshal in
-//  because I kinda need a runtime access to the settings
-//  and I can't predict what you might need in your application
-//  you can use native viper to get access to the settings
+//
+//	because I kinda need a runtime access to the settings
+//	and I can't predict what you might need in your application
+//	you can use native viper to get access to the settings
 func LoadSettingsHttp() (err error) {
 	// Set the file name of the configurations file
 	viper.SetConfigName("local.http.env")
@@ -40,8 +41,8 @@ func loadSentry() error {
 	}
 
 	err := sentry.Init(sentry.ClientOptions{
-		Dsn: viper.GetString("sentry_dsn"),
-		EnableTracing: true,
+		Dsn:              viper.GetString("sentry_dsn"),
+		EnableTracing:    true,
 		AttachStacktrace: true,
 	})
 	if err != nil {
